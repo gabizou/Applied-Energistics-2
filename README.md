@@ -1,6 +1,5 @@
-[![Latest Build](https://img.shields.io/teamcity/http/ci.tsr.me/s/AppliedEnergistics_AutoHeadBuild.svg?label=Latest Build)](http://ci.tsr.me/viewType.html?buildTypeId=AppliedEnergistics_AutoHeadBuild&tab=buildTypeStatusDiv)
-[![Latest Tag](https://img.shields.io/github/tag/AppliedEnergistics/Applied-Energistics-2.svg?label=Latest Tag)](https://github.com/AppliedEnergistics/Applied-Energistics-2/tags)
-[![Latest Release](https://img.shields.io/github/release/AppliedEnergistics/Applied-Energistics-2.svg?label=Latest Release)](https://github.com/AppliedEnergistics/Applied-Energistics-2/releases)
+[![Travis](https://img.shields.io/travis/AppliedEnergistics/Applied-Energistics-2.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/AppliedEnergistics/Applied-Energistics-2)
+[![Latest Release](https://img.shields.io/github/release/AppliedEnergistics/Applied-Energistics-2.svg?label=Latest Release&style=flat-square)](https://github.com/AppliedEnergistics/Applied-Energistics-2/releases)
 
 # Applied Energistics 2
 
@@ -10,6 +9,7 @@
 * [Contacts](#contacts)
 * [License](#license)
 * [Downloads](#downloads)
+* [Nightly Builds](#nightly-builds)
 * [Installation](#installation)
 * [Issues](#issues)
 * [Building](#building)
@@ -32,19 +32,27 @@ A Mod about Matter, Energy and using them to conquer the world..
 
 * Applied Energistics 2 API
   - (c) 2013 - 2015 AlgorithmX2 et al
-  - [![License](https://img.shields.io/badge/License-MIT-red.svg?style=flat)](http://opensource.org/licenses/MIT)
+  - [![License](https://img.shields.io/badge/License-MIT-red.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 * Applied Energistics 2
   - (c) 2013 - 2015 AlgorithmX2 et al
-  - [![License](https://img.shields.io/badge/License-LGPLv3-blue.svg?style=flat)](https://raw.githubusercontent.com/AppliedEnergistics/Applied-Energistics-2/rv2/LICENSE)
+  - [![License](https://img.shields.io/badge/License-LGPLv3-blue.svg?style=flat-square)](https://raw.githubusercontent.com/AppliedEnergistics/Applied-Energistics-2/rv2/LICENSE)
 * Textures and Models
   - (c) 2013 - 2015 AlgorithmX2 et al
-  - [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%203.0-yellow.svg?style=flat)](https://creativecommons.org/licenses/by-nc-sa/3.0/)
+  - [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%203.0-yellow.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 * Text and Translations
-  - [![License](https://img.shields.io/badge/License-No%20Restriction-green.svg?style=flat)](https://creativecommons.org/publicdomain/zero/1.0/)
+  - [![License](https://img.shields.io/badge/License-No%20Restriction-green.svg?style=flat-square)](https://creativecommons.org/publicdomain/zero/1.0/)
 
 ## Downloads
 
 Downloads can be found on [CurseForge](http://www.curse.com/mc-mods/minecraft/223794-applied-energistics-2) or on the [official website](http://ae-mod.info/Downloads/).
+
+## Nightly Builds
+
+[![Build status](https://ci.appveyor.com/api/projects/status/w0sg7upakn0vj5gc?svg=true)](https://ci.appveyor.com/project/shartte/applied-energistics-2/history)
+
+[Download Latest Nightly Build](https://ci.appveyor.com/api/projects/shartte/applied-energistics-2/artifacts/ae2-rv4-nightly.zip?branch=master)
+
+Nightly builds for the Minecraft 1.10.2 branch of AE2 (rv4-alpha) are available from [AppVeyor](https://ci.appveyor.com/project/shartte/applied-energistics-2/history). These builds are only for testing purposes and might lead to loss of data, and will contain significant bugs. Please see below on how you can report bugs you find during testing.
 
 ## Installation
 
@@ -91,11 +99,11 @@ Providing as many details as possible does help us to find and resolve the issue
   - CI server `gradlew setupCIWorkspace`
 3. Build `gradlew build`. Jar will be in `build/libs`
 4. For core developer: Setup IDE
-  - IntelliJ: Import into IDE and execute `gradlew genIntellijRuns` afterwards
+  - IntelliJ: Import into IDE, execute `gradlew genIntellijRuns` and change RunConfiguration to `*_main` as quickfix for [ForgeGradle](https://github.com/MinecraftForge/ForgeGradle/issues/357)
   - Eclipse: execute `gradlew eclipse`
 5. For add-on developer: Core-Mod Detection
   - In order to have FML detect AE from your dev environment, add the following VM Option to your run profile
-  - `-Dfml.coreMods.load=appeng.transformer.AppEngCore`
+  - `-Dfml.coreMods.load=appeng.coremod.AppEngCore`
 
 ## Contribution
 
@@ -160,9 +168,17 @@ An example string would be `appeng:appliedenergistics2:rv2-alpha-30:dev`
 
 Files must be encoded as UTF-8.
 
-### New Translations
+### New or updated Translations
 
-You can provide any additional languages by creating a new file with the [appropriate language code](http://download1.parallels.com/SiteBuilder/Windows/docs/3.2/en_US/sitebulder-3.2-win-sdk-localization-pack-creation-guide/30801.htm).
+The language files are located in `/src/main/resources/assets/appliedenergistics2/lang/` and use the [appropriate locale code](http://minecraft.gamepedia.com/Language) as name and `.lang` as extension.
+
+To update an translation edit the corresponding file and improve/correct the existing entry. Or copy any entries from `en_US.lang` for missing translation.
+
+To create a new translation, copy the contents of `en_US.lang`, create a new file with appropriate filename, and translate it to your language.
+
+Please keep in mind that we use [String format](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html) to pass additional data to the text for displaying.
+Therefore you should preserve parts like `%s` or `%1$d%%`, which allows us to replace them with the correct values while you still have the option to change their order for match the rules of grammar.
+This might not be possible for some languages. Should this be the case, please contact us.
 
 ### Final Note
 

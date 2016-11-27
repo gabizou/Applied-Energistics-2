@@ -38,16 +38,9 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testCompile "junit:junit:4.12"
-}
-
-//apply from: 'gradle/scripts/dependencies.gradle'
+apply from: 'gradle/scripts/dependencies.gradle'
 apply from: 'gradle/scripts/artifacts.gradle'
-//apply from: 'gradle/scripts/autoinstallruntime.gradle'
-apply from: 'gradle/scripts/integration.gradle'
-//apply from: 'gradle/scripts/optional.gradle'
-
+apply from: 'gradle/scripts/optional.gradle'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -56,29 +49,26 @@ version = aeversion + "-" + aechannel + "-" + aebuild
 group = aegroup
 archivesBaseName = aebasename
 
-// If TeamCity is running this build, lets set the version info
-if (hasProperty("teamcity")) {
-    version = teamcity["build.number"]
-
-    // Fix for main branch being built
-    version = version.replaceAll("/", "-")
-}
-
 // Add Coremod Manifest
 jar {
     manifest {
         attributes 'FMLCorePluginContainsFMLMod': 'true'
+        attributes 'FMLAT': 'appeng_at.cfg'
     }
+
+    from sourceSets.api.output
+    dependsOn apiClasses
 
     // specify which files are really included, can control which APIs should be in
     include "appeng/**"
     include "assets/**"
     include "mcmod.info"
     include "pack.mcmeta"
+    include "META-INF/appeng_at.cfg"
 }
 
 minecraft {
-    coreMod = "appeng.transformer.AppEngCore"
+    coreMod = "appeng.coremod.AppEngCore"
 
     version = minecraft_version + "-" + forge_version
 
@@ -96,32 +86,40 @@ minecraft {
 }
 
 sourceSets {
-    main {
-        java {
-            srcDirs += 'src/api/java'
-            srcDirs += 'src/main/java/'
-        }
 
-        resources {
-            srcDir "src/main/resources/"
-            include "assets/appliedenergistics2/recipes/**/*.recipe",
-                    "assets/appliedenergistics2/recipes/README.html",
-                    "assets/appliedenergistics2/lang/*.lang",
-                    "assets/appliedenergistics2/blockstates/**/*.json",
-                    "assets/appliedenergistics2/models/**/*.json",
-                    "assets/appliedenergistics2/textures/**/*.png",
-                    "assets/appliedenergistics2/textures/**/*.mcmeta",
-                    "assets/appliedenergistics2/meta/*",
-                    "mcmod.info",
-                    "pack.mcmeta"
-        }
+    api
+
+    // This source set will contain third party API code that we need to compile, but which is not shipped with the jar
+    thirdparty {
+        // Third Party APIs often need access to Minecraft classes (i.e. EnumFacing), so set this up here
+        compileClasspath += configurations.forgeGradleMc + configurations.forgeGradleMcDeps
     }
+
+    main
+
 }
 
-processResources {
+dependencies {
+    compile sourceSets.thirdparty.output
+}
+
+processResources
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': minecraft_version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
+
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+
+    // move access transformer to META-INF
+    rename '(.+_at.cfg)', 'META-INF/$1'
 }
